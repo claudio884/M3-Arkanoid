@@ -1,7 +1,6 @@
 #ifndef BOLA_H
 #define BOLA_H
 
-#include "posicao.h"
 #include "barra.h"
 
 struct Bola {
@@ -11,14 +10,19 @@ struct Bola {
     float velocidadeY;
     bool presa;
     Posicao rastro[10];
-    int rastroBola;
+    int rastroIndex;
 };
 
-void inicializaBola(Bola* bola, Barra* barra);
-void atualizaBola(Bola* bola, Barra* barra, float deltaTime);
-void desenhaBola(const Bola* bola);
-bool verificaColisaoBolaBarra(const Bola* bola, const Barra* barra);
-void lancaBola(Bola* bola, float velocidadeInicial);
-void resetaBola(Bola* bola, Barra* barra);
+void inicializarBola(Bola *bola, Barra *barra); 
+
+void atualizarBola(Bola *bola, Barra *barra, float dt);
+
+void desenharBola(Bola *bola);
+
+void lancarBola(Bola *bola, float velocidadeBase);
+
+bool verificarColisaoBarra(Bola *bola, Barra *barra);
+
+void resetarBola(Bola *bola, Barra *barra);
 
 #endif
