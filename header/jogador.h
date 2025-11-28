@@ -1,19 +1,22 @@
 #ifndef JOGADOR_H
 #define JOGADOR_H
 
-#include "barra.h"
-
 struct Jogador {
-    int vidas;
-    int pontos;
-    int tempoJogado;
-    char dataHora[30];
     char nome[50];
+    char data[20];
+    int pontuacao;
+    int tempoJogado;
+    int vidas;
 };
 
-void inicializaJogador(Jogador* jogador, const char* nome);
-void modificaPontos(Jogador* jogador, int pontosDelta);
-void modificaVidas(Jogador* jogador, int vidasDelta);
-void modificaTempoJogado(Jogador* jogador, int tempoDelta);
+void inicializarJogador(Jogador *jogador, const char *nome);
+
+void atualizarPontuacao(Jogador *jogador, int pontos);
+
+void adicionarVida(Jogador *jogador);
+
+void removerVida(Jogador *jogador);
+
+void atualizarTempo(Jogador *jogador, int segundos);
 
 #endif
