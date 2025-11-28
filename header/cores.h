@@ -3,7 +3,7 @@
 
 #include "raylib.h"
 
-Color obterCorBloco(int vida);
+Color obterCorTijolo(int vida);
 
 Color obterCorItem(int tipo);
 
