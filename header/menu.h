@@ -2,7 +2,7 @@
 #define MENU_H
 
 struct Menu {
-    int opcao;
+    int opcaoSelecionada;
     int totalOpcoes;
     char nomeJogador[50];
     int tamanhoNome;
