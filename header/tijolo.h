@@ -6,15 +6,19 @@
 
 struct Tijolo {
     Posicao posicao;
+    int vida;
+    bool ativo;
     float largura;
     float altura;
-    bool ativo;
-    int vidaAtual;
+    int corAleatoria;
 };
 
-void inicializaTijolo(Tijolo* tijolo, float x, float y, int vidaAtual);
-void desenhaTijolo(const Tijolo* tijolo);
-void destroiTijolo(Tijolo* tijolo);
-void colisaoTijolo(Tijolo* tijolo, Bola* bola);
+void inicializarTijolo(Tijolo *tijolo, float posicaoX, float posicaoY, int vida);
+
+void desenharTijolo(Tijolo *tijolo);
+
+bool verificarColisaoTijolo(Bola *bola, Tijolo *tijolo);
+
+void danificarTijolo(Tijolo *tijolo);
 
 #endif
