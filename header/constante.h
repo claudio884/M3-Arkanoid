@@ -1,30 +1,29 @@
-
 #ifndef CONSTANTES_H
 #define CONSTANTES_H
 
 #define UP 0 
 #define DOWN 1
 #define LEFT 2
-#define RIGHT 3
+#define RIGTH 3
 
 #define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
+#define SCREEN_HEIGTH 600
 
 #define RECT_WIDTH 100.0f
-#define RECT_HEIGHT 20.0f
+#define RECT_HEIGTH 20.0f
 
 #define SPEED 400.0f
 
 #define RADIO 12.0f
 
-#define MAX_BLOCOS 100
+#define MAX_TIJOLOS 100
 
 #define MAX_JOGADORES 10
 
 #define VIDAS_INICIAIS 3
 
-#define BLOCO_LARGURA 60.0f
-#define BLOCO_ALTURA 20.0f
+#define TIJOLO_LARGURA 80.0f
+#define TIJOLO_ALTURA 35.0f
 
 #define ITEM_LARGURA 30.0f
 #define ITEM_ALTURA 30.0f
@@ -32,14 +31,16 @@
 
 #define BOLA_VELOCIDADE_BASE 300.0f
 
-#define PONTOS_BLOCO_VIDA1 10
-#define PONTOS_BLOCO_VIDA2 20
-#define PONTOS_BLOCO_VIDA3 30
+#define PONTOS_TIJOLO_VIDA1 10
+#define PONTOS_TIJOLO_VIDA2 20
+#define PONTOS_TIJOLO_VIDA3 30
 #define PONTOS_ITEM 50
 
 #define TAMANHO_AUMENTO_BARRA 20.0f
 #define TAMANHO_DIMINUIR_BARRA 20.0f
 
 #define ARQUIVO_RANKING "ranking.txt"
+
+extern int FASE_ATUAL;
 
 #endif
