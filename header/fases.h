@@ -1,9 +1,8 @@
-
 #ifndef FASES_H
 #define FASES_H
 
 #include "tijolo.h"
-#include "constante.h"
+#include "constantes.h"
 
 struct Fase {
     Tijolo *tijolo;
@@ -20,7 +19,7 @@ void desenharFase(Fase *fase);
 
 bool verificarFaseCompleta(Fase *fase);
 
-int contarBlocosAtivos(Fase *fase);
+int contarTijolosAtivos(Fase *fase);
 
 void liberarFase(Fase *fase);
 
