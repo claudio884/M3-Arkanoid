@@ -5,7 +5,7 @@
 
 struct Sons {
     Sound colisaoBarra;
-    Sound colisaoBloco;
+    Sound colisaoTijolo;
     Sound itemColetado;
     Sound perdeuVida;
     Sound faseCompleta;
@@ -18,7 +18,7 @@ void descarregarSons(Sons *sons);
 
 void tocarSomColisaoBarra(Sons *sons);
 
-void tocarSomColisaoBloco(Sons *sons);
+void tocarSomColisaoTijolo(Sons *sons);
 
 void tocarSomItemColetado(Sons *sons);
 
