@@ -1,31 +1,48 @@
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
 #include "../header/jogador.h"
-#include "../header/constante.h"
+#include "../header/constantes.h"
+#include <cstring>
+#include <ctime>
 
-void inicializaJogador(Jogador* jogador, const char* nome) {
-    jogador->vidas = VIDAS_INICIAIS;
-    jogador->pontos = 0;
+void inicializarJogador(Jogador *jogador, const char *nome) {
+    strncpy(jogador->nome, nome, 49);
+    jogador->nome[49] = '\0';
+    
+
+    time_t agora = time(0);
+    struct tm *tempoAgora = localtime(&agora);
+    
+    if (tempoAgora != nullptr) {
+        strftime(jogador->data, 20, "%d/%m/%Y %H:%M", tempoAgora);
+    } else {
+        strncpy(jogador->data, "00/00/0000 00:00", 19);
+        jogador->data[19] = '\0';
+    }
+    
+    jogador->pontuacao = 0;
     jogador->tempoJogado = 0;
-    strncpy(jogador->nome, nome ? nome : "Anonimo", sizeof(jogador->nome)-1);
-    jogador->nome[sizeof(jogador->nome)-1] = '\0';
-    time_t agora = time(NULL);
-    struct tm *tm_ = localtime(&agora);
-    strftime(jogador->dataHora, sizeof(jogador->dataHora), "%Y-%m-%d %H:%M:%S", tm_);
+    jogador->vidas = VIDAS_INICIAIS;
 }
 
-void modificaPontos(Jogador* jogador, int pontosDelta) {
-    jogador->pontos += pontosDelta;
-    if (jogador->pontos < 0) jogador->pontos = 0;
+void atualizarPontuacao(Jogador *jogador, int pontos) {
+    jogador->pontuacao += pontos;
+    if (jogador->pontuacao < 0) {
+        jogador->pontuacao = 0;
+    }
 }
 
-void modificaVidas(Jogador* jogador, int vidasDelta) {
-    jogador->vidas += vidasDelta;
-    if (jogador->vidas < 0) jogador->vidas = 0;
+void adicionarVida(Jogador *jogador) {
+    jogador->vidas++;
+    if (jogador->vidas > 9) {
+        jogador->vidas = 9;
+    }
 }
 
-void modificaTempoJogado(Jogador* jogador, int tempoDelta) {
-    jogador->tempoJogado += tempoDelta;
-    if (jogador->tempoJogado < 0) jogador->tempoJogado = 0;
+void removerVida(Jogador *jogador) {
+    if (jogador->vidas > 0) {
+        jogador->vidas--;
+    }
+}
+
+void atualizarTempo(Jogador *jogador, int segundos) {
+    jogador->tempoJogado = segundos;
 }
