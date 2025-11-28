@@ -3,13 +3,13 @@
 
 #include "barra.h"
 #include "bola.h"
-#include "fase.h"
+#include "fases.h"
 #include "jogador.h"
-#include "item.h"
+#include "itens.h"
 #include "estadoJogo.h"
 #include "sons.h"
 #include "particulas.h"
-#include "constante.h"
+#include "constantes.h"
 
 struct Jogo {
     Barra barra;
