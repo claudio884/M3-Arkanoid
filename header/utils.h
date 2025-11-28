@@ -1,4 +1,3 @@
-
 #ifndef UTILS_H
 #define UTILS_H
 
@@ -21,9 +20,9 @@ void liberarArray(float *arr);
 
 int somarRecursivo(int n);
 
-int calcularPontosRecursivo(int blocos, int multiplicador);
+int calcularPontosRecursivo(int tijolos, int multiplicador);
 
-int contarBlocosRecursivo(struct Bloco *blocos, int inicio, int fim);
+int contarTijolosRecursivo(struct Tijolo *tijolos, int inicio, int fim);
 
 void ordenarPontosRecursivo(int *pontos, int inicio, int fim);
 
