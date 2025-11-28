@@ -1,34 +1,47 @@
-#include "../header/constante.h"
 #include "../header/barra.h"
+#include "../header/constantes.h"
+#include "../header/utils.h"
+#include "raylib.h"
 
-void inicializaBarra(Barra* barraX) {
-    barraX->posicao.x = SCREEN_WIDTH/2.0f - RECT_WIDTH/2.0f;
-    barraX->posicao.y = SCREEN_HEIGHT - 60.0f;
-    barraX->largura = RECT_WIDTH;
-    barraX->altura = RECT_HEIGHT;
-    barraX->velocidadeX = SPEED;
+void inicializarBarra(Barra *barra) {
+    barra->posicao.x = SCREEN_WIDTH / 2.0f - RECT_WIDTH / 2.0f;
+    barra->posicao.y = SCREEN_HEIGTH - 50.0f;
+    barra->largura = RECT_WIDTH;
+    barra->altura = RECT_HEIGTH;
+    barra->velocidadeX = 0.0f;
 }
 
-void atualizaBarra(Barra* barraX) {
-    float delta = 0.016f;
-    float movimento = 0.0f;
-    if (movimento < 0) movimento -= 1.0f;
-    if (movimento > 0) movimento += 1.0f;
-    barraX->posicao.x += movimento * barraX->velocidadeX * delta;
-    if (barraX->posicao.x < 0) barraX->posicao.x = 0;
-    if (barraX->posicao.x + barraX->largura > SCREEN_WIDTH) barraX->posicao.x = SCREEN_WIDTH - barraX->largura;
+void atualizarBarra(Barra *barra, float dt) {
+    if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) {
+        barra->velocidadeX = -SPEED;
+    } else if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
+        barra->velocidadeX = SPEED;
+    } else {
+        barra->velocidadeX = 0.0;
+    }
+
+    barra->posicao.x += barra->velocidadeX * dt;
+
+    if (barra->posicao.x < 0) {
+        barra->posicao.x = 0;
+    }
+    if (barra->posicao.x + barra->largura > SCREEN_WIDTH) {
+        barra->posicao.x = SCREEN_WIDTH - barra->largura;
+    }
 }
 
-void desenhaBarra(const Barra* barraX) {
+void desenharBarra(Barra *barra) {
+    DrawRectangle((int)barra->posicao.x, (int)barra->posicao.y, 
+                  (int)barra->largura, (int)barra->altura, BLACK);
+    DrawRectangleLines((int)barra->posicao.x, (int)barra->posicao.y, 
+                       (int)barra->largura, (int)barra->altura, BLACK);
 }
 
-void modificarTamanhoBarra(Barra* barraX, float tamanhoDelta) {
-    float centro = barraX->posicao.x + barraX->largura/2.0f;
-    barraX->largura += tamanhoDelta;
-    if (barraX->largura < 40.0f) barraX->largura = 40.0f;
-    if (barraX->largura > 240.0f) barraX->largura = 240.0f;
-    barraX->posicao.x = centro - barraX->largura/2.0f;
-    if (barraX->posicao.x < 0) barraX->posicao.x = 0;
-    if (barraX->posicao.x + barraX->largura > SCREEN_WIDTH) barraX->posicao.x = SCREEN_WIDTH - barraX->largura;
+void aumentarTamanhoBarra(Barra *barra, float tamanhoAdd) {
+    barra->largura += tamanhoAdd;
+    barra->largura = minimo(barra->largura, SCREEN_WIDTH * 0.5f);
 }
-
+void diminuirTamanhoBarra(Barra *barra, float tamanhoSub) {
+    barra->largura -= tamanhoSub;
+    barra->largura = maximo(barra->largura, 40.0f);
+}
