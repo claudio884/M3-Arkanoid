@@ -1,33 +1,49 @@
-#include <stdio.h>
-#include <string.h>
 #include "../header/ranking.h"
-#include "../header/constante.h"
+#include "../header/constantes.h"
+#include "raylib.h"
+#include <cstring>
+#include <fstream>
 
-void inicializarRanking(Ranking* ranking) {
-    if (!ranking) return;
-    ranking->totalJogadores = 0;
+using namespace std;
+
+void inicializarRanking(Ranking *ranking) {
+    ranking->qtdJogadores = 0;
     for (int i = 0; i < MAX_JOGADORES; i++) {
-        ranking->jogadores[i].vidas = 0;
-        ranking->jogadores[i].pontos = 0;
+        ranking->jogadores[i].pontuacao = 0;
         ranking->jogadores[i].tempoJogado = 0;
-        ranking->jogadores[i].nome[0] = '\0';
-        ranking->jogadores[i].dataHora[0] = '\0';
+        ranking->jogadores[i].vidas = 0;
+        strcpy(ranking->jogadores[i].nome, "");
+        strcpy(ranking->jogadores[i].data, "");
     }
 }
 
-void adicionarJogadorRanking(Ranking* ranking, Jogador jogador) {
-    if (!ranking || ranking->totalJogadores >= MAX_JOGADORES) return;
-    ranking->jogadores[ranking->totalJogadores] = jogador;
-    ranking->totalJogadores++;
+void adicionarJogadorRanking(Ranking *ranking, Jogador jogador) {
+    if (ranking->qtdJogadores < MAX_JOGADORES) {
+        ranking->jogadores[ranking->qtdJogadores] = jogador;
+        ranking->qtdJogadores++;
+    } else {
+        int menorIndice = 0;
+        int menorPontuacao = ranking->jogadores[0].pontuacao;
+
+        for (int i = 1; i < MAX_JOGADORES; i++) {
+            if (ranking->jogadores[i].pontuacao < menorPontuacao) {
+                menorPontuacao = ranking->jogadores[i].pontuacao;
+                menorIndice = i;
+            }
+        }
+
+        if (jogador.pontuacao > menorPontuacao) {
+            ranking->jogadores[menorIndice] = jogador;
+        }
+    }
+
     ordenarRanking(ranking);
 }
 
-void ordenarRanking(Ranking* ranking) {
-    if (!ranking || ranking->totalJogadores <= 1) return;
-    
-    for (int i = 0; i < ranking->totalJogadores - 1; i++) {
-        for (int j = 0; j < ranking->totalJogadores - i - 1; j++) {
-            if (ranking->jogadores[j].pontos < ranking->jogadores[j + 1].pontos) {
+void ordenarRanking(Ranking *ranking) {
+    for (int i = 0; i < ranking->qtdJogadores - 1; i++) {
+        for (int j = 0; j < ranking->qtdJogadores - i - 1; j++) {
+            if (ranking->jogadores[j].pontuacao < ranking->jogadores[j + 1].pontuacao) {
                 Jogador temp = ranking->jogadores[j];
                 ranking->jogadores[j] = ranking->jogadores[j + 1];
                 ranking->jogadores[j + 1] = temp;
@@ -36,82 +52,83 @@ void ordenarRanking(Ranking* ranking) {
     }
 }
 
-void salvarRanking(Ranking* ranking, const char* arquivo) {
-    if (!ranking || !arquivo) return;
-    
-    FILE *f = fopen(arquivo, "w");
-    if (!f) return;
-    
-    fprintf(f, "%d\n", ranking->totalJogadores);
-    for (int i = 0; i < ranking->totalJogadores; i++) {
-        fprintf(f, "%s|%d|%d|%s\n",
-                ranking->jogadores[i].nome,
-                ranking->jogadores[i].pontos,
-                ranking->jogadores[i].tempoJogado,
-                ranking->jogadores[i].dataHora);
+void salvarRanking(Ranking *ranking, const char *arquivo) {
+    ofstream file(arquivo);
+    if (!file.is_open()) return;
+
+    file << ranking->qtdJogadores << "\n";
+
+    for (int i = 0; i < ranking->qtdJogadores; i++) {
+        file << ranking->jogadores[i].nome << "\n";
+        file << ranking->jogadores[i].data << "\n";
+        file << ranking->jogadores[i].pontuacao << "\n";
+        file << ranking->jogadores[i].tempoJogado << "\n";
+        file << ranking->jogadores[i].vidas << "\n";
     }
-    
-    fclose(f);
+
+    file.close();
 }
 
-void carregarRanking(Ranking* ranking, const char* arquivo) {
-    if (!ranking || !arquivo) return;
-    
-    inicializarRanking(ranking);
-    
-    FILE *f = fopen(arquivo, "r");
-    if (!f) return;
-    
-    int total = 0;
-    if (fscanf(f, "%d\n", &total) != 1) {
-        fclose(f);
+void carregarRanking(Ranking *ranking, const char *arquivo) {
+    ifstream file(arquivo);
+    if (!file.is_open()) {
+        inicializarRanking(ranking);
         return;
     }
-    
-    if (total > MAX_JOGADORES) total = MAX_JOGADORES;
-    
-    for (int i = 0; i < total; i++) {
-        char buffer[200];
-        if (fgets(buffer, sizeof(buffer), f) == NULL) break;
-        
-        char nome[50];
-        int pontos, tempo;
-        char dataHora[30];
-        
-        if (sscanf(buffer, "%49[^|]|%d|%d|%29[^\n]", nome, &pontos, &tempo, dataHora) == 4) {
-            strncpy(ranking->jogadores[i].nome, nome, sizeof(ranking->jogadores[i].nome) - 1);
-            ranking->jogadores[i].nome[sizeof(ranking->jogadores[i].nome) - 1] = '\0';
-            ranking->jogadores[i].pontos = pontos;
-            ranking->jogadores[i].tempoJogado = tempo;
-            strncpy(ranking->jogadores[i].dataHora, dataHora, sizeof(ranking->jogadores[i].dataHora) - 1);
-            ranking->jogadores[i].dataHora[sizeof(ranking->jogadores[i].dataHora) - 1] = '\0';
-            ranking->totalJogadores++;
-        }
+
+    file >> ranking->qtdJogadores;
+    file.ignore();
+
+    if (ranking->qtdJogadores > MAX_JOGADORES) {
+        ranking->qtdJogadores = MAX_JOGADORES;
     }
-    
-    fclose(f);
-    ordenarRanking(ranking);
+
+    for (int i = 0; i < ranking->qtdJogadores; i++) {
+        file.getline(ranking->jogadores[i].nome, 50);
+        file.getline(ranking->jogadores[i].data, 20);
+        file >> ranking->jogadores[i].pontuacao;
+        file >> ranking->jogadores[i].tempoJogado;
+        file >> ranking->jogadores[i].vidas;
+        file.ignore();
+    }
+
+    file.close();
 }
 
-void desenharRanking(Ranking* ranking) {
-    if (!ranking) return;
-    
-    printf("\n");
-    printf("========================================\n");
-    printf("           RANKING - TOP 10\n");
-    printf("========================================\n");
-    printf("Pos | Nome                | Pontos | Tempo\n");
-    printf("----------------------------------------\n");
-    
-    int limite = ranking->totalJogadores < 10 ? ranking->totalJogadores : 10;
-    
-    for (int i = 0; i < limite; i++) {
-        printf("%2d  | %-18s | %6d | %4ds\n",
-               i + 1,
-               ranking->jogadores[i].nome,
-               ranking->jogadores[i].pontos,
-               ranking->jogadores[i].tempoJogado);
+void desenharRanking(Ranking *ranking) {
+    // FUNDO PRETO
+    ClearBackground(DARKGRAY);
+
+    // TÍTULO EM VERMELHO
+    DrawText("RANKING", SCREEN_WIDTH / 2 - 100, 30, 50, BLACK);
+    DrawText("RANKING", SCREEN_WIDTH / 2 - 100 + 3, 30 + 3, 50, RED);
+
+    // LETRAS BRANCAS
+    DrawText("Posicao", 50, 100, 20, BLACK);
+    DrawText("Nome", 150, 100, 20, BLACK);
+    DrawText("Pontos", 350, 100, 20, BLACK);
+    DrawText("Tempo", 470, 100, 20, BLACK);
+    DrawText("Data", 580, 100, 20, BLACK);
+
+    DrawLine(40, 125, SCREEN_WIDTH - 40, 125, BLACK);
+
+    for (int i = 0; i < ranking->qtdJogadores && i < 8; i++) {
+        int y = 140 + i * 40;
+
+        DrawText(TextFormat("%d", i + 1), 80, y, 20, BLACK);
+        DrawText(ranking->jogadores[i].nome, 150, y, 20, BLACK);
+        DrawText(TextFormat("%d", ranking->jogadores[i].pontuacao), 350, y, 20, BLACK);
+        DrawText(TextFormat("%ds", ranking->jogadores[i].tempoJogado), 470, y, 20, BLACK);
+        DrawText(ranking->jogadores[i].data, 580, y, 16, BLACK);
     }
-    
-    printf("========================================\n\n");
+
+    if (ranking->qtdJogadores == 0) {
+        DrawText("Nenhum registro ainda!", SCREEN_WIDTH / 2 - 120, 250, 25, BLACK);
+    }
+
+    DrawText("Pressione ESC para voltar", 
+             SCREEN_WIDTH / 2 - 140, 
+             SCREEN_HEIGTH - 40, 
+             20, 
+             BLACK);
 }
