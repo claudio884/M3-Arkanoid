@@ -1,97 +1,111 @@
-#include <stdlib.h>
-#include "../header/util.h"
+#include "../header/utils.h"
+#include "../header/tijolo.h"
+#include <cstdlib>
 
 template<typename T>
 T maximo(T a, T b) {
-    return a > b ? a : b;
+    return (a > b) ? a : b;
 }
 
 template<typename T>
 T minimo(T a, T b) {
-    return a < b ? a : b;
+    return (a < b) ? a : b;
 }
 
 template<typename T>
-void trocar(T* a, T* b) {
-    if (!a || !b) return;
+void trocar(T *a, T *b) {
     T temp = *a;
     *a = *b;
     *b = temp;
 }
 
+template int maximo<int>(int, int);
+template float maximo<float>(float, float);
+template int minimo<int>(int, int);
+template float minimo<float>(float, float);
+template void trocar<int>(int*, int*);
+template void trocar<float>(float*, float*);
+
 int* alocarArrayInt(int tamanho) {
-    if (tamanho <= 0) return NULL;
-    return (int*) malloc(sizeof(int) * tamanho);
+    int *arr = (int*)malloc(tamanho * sizeof(int));
+    if (arr != NULL) {
+        for (int i = 0; i < tamanho; i++) {
+            arr[i] = 0;
+        }
+    }
+    return arr;
 }
 
 float* alocarArrayFloat(int tamanho) {
-    if (tamanho <= 0) return NULL;
-    return (float*) malloc(sizeof(float) * tamanho);
+    float *arr = (float*)malloc(tamanho * sizeof(float));
+    if (arr != NULL) {
+        for (int i = 0; i < tamanho; i++) {
+            arr[i] = 0.0f;
+        }
+    }
+    return arr;
 }
 
-void liberarArray(int* arr) {
-    if (arr) free(arr);
+void liberarArray(int *arr) {
+    if (arr != NULL) {
+        free(arr);
+    }
 }
 
-void liberarArray(float* arr) {
-    if (arr) free(arr);
+void liberarArray(float *arr) {
+    if (arr != NULL) {
+        free(arr);
+    }
 }
 
 int somarRecursivo(int n) {
-    if (n <= 0) return 0;
+    if (n <= 0) {
+        return 0;
+    }
     return n + somarRecursivo(n - 1);
 }
 
-int calcularPontosRecursivos(int tijolos, int multiplicador) {
-    if (tijolos <= 0) return 0;
-    return (tijolos * multiplicador) + calcularPontosRecursivos(tijolos - 1, multiplicador);
+int calcularPontosRecursivo(int tijolo, int multiplicador) {
+    if (tijolo <= 0) {
+        return 0;
+    }
+    return (10 * multiplicador) + calcularPontosRecursivo(tijolo - 1, multiplicador);
 }
 
-int contarTijolosRecursivos(Tijolo* tijolos, int inicio, int fim) {
-    if (!tijolos || inicio > fim) return 0;
-    if (inicio == fim) return tijolos[inicio].ativo ? 1 : 0;
-    int meio = (inicio + fim) / 2;
-    return contarTijolosRecursivos(tijolos, inicio, meio) + 
-           contarTijolosRecursivos(tijolos, meio + 1, fim);
+int contarTijolosRecursivo(Tijolo *tijolos, int inicio, int fim) {
+    if (inicio > fim) {
+        return 0;
+    }
+
+    int count = tijolos[inicio].ativo ? 1 : 0;
+    return count + contarTijolosRecursivo(tijolos, inicio + 1, fim);
 }
 
-void ordenarPontosRecursivos(int* pontos, int inicio, int fim) {
-    if (!pontos || inicio >= fim) return;
+void ordenarPontosRecursivo(int *pontos, int inicio, int fim) {
+    if (inicio >= fim) {
+        return;
+    }
     
-    int meio = (inicio + fim) / 2;
-    ordenarPontosRecursivos(pontos, inicio, meio);
-    ordenarPontosRecursivos(pontos, meio + 1, fim);
+    int pivo = pontos[fim];
+    int i = inicio - 1;
     
-    int* temp = (int*) malloc(sizeof(int) * (fim - inicio + 1));
-    if (!temp) return;
-    
-    int i = inicio, j = meio + 1, k = 0;
-    while (i <= meio && j <= fim) {
-        if (pontos[i] >= pontos[j]) {
-            temp[k++] = pontos[i++];
-        } else {
-            temp[k++] = pontos[j++];
+    for (int j = inicio; j < fim; j++) {
+        if (pontos[j] > pivo) {
+            i++;
+            trocar(&pontos[i], &pontos[j]);
         }
     }
     
-    while (i <= meio) temp[k++] = pontos[i++];
-    while (j <= fim) temp[k++] = pontos[j++];
+    trocar(&pontos[i + 1], &pontos[fim]);
+    int pivoPos = i + 1;
     
-    for (i = inicio, k = 0; i <= fim; i++, k++) {
-        pontos[i] = temp[k];
-    }
-    
-    free(temp);
+    ordenarPontosRecursivo(pontos, inicio, pivoPos - 1);
+    ordenarPontosRecursivo(pontos, pivoPos + 1, fim);
 }
 
 int calcularFatorial(int n) {
-    if (n <= 1) return 1;
+    if (n <= 1) {
+        return 1;
+    }
     return n * calcularFatorial(n - 1);
 }
-
-template int maximo<int>(int a, int b);
-template float maximo<float>(float a, float b);
-template int minimo<int>(int a, int b);
-template float minimo<float>(float a, float b);
-template void trocar<int>(int* a, int* b);
-template void trocar<float>(float* a, float* b);
