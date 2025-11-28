@@ -2,8 +2,8 @@
 
 void inicializarEstado(EstadoJogo *estado) {
     estado->estadoAtual = ESTADO_MENU;
-    estado->dificuldade = DIFICULDADE_MEDIO;
-    estado->faseAtual = 0;
+    estado->dificuldade = DIFICULDADE_FACIL;
+    estado->faseAtual = 1;
     estado->multiplicadorVelocidade = 1.0f;
     estado->multiplicadorPontos = 1.0f;
     estado->inversorPontos = false;
@@ -21,7 +21,10 @@ void aplicarDificuldade(EstadoJogo *estado, int dificuldade) {
 }
 
 float obterMultiplicadorVelocidade(int dificuldade) {
-    if (dificuldade == DIFICULDADE_FACIL) return 0.9f;
-    if (dificuldade == DIFICULDADE_MEDIO) return 1.0f;
-    return 1.15f;
+    if (dificuldade == DIFICULDADE_MEDIO) {
+        return 1.25f;
+    } else if (dificuldade == DIFICULDADE_DIFICIL) {
+        return 1.5f;
+    }
+    return 1.0f;
 }
