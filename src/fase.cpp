@@ -1,64 +1,94 @@
-#include <stdlib.h>
-#include "../header/fase.h"
-#include "../header/cor.h"
+#include "../header/fases.h"
+#include "../header/constantes.h"
+#include "../header/utils.h"
+#include "raylib.h"
+#include <cstdlib>
 
 void inicializarFase(Fase *fase, int numeroFase) {
-    fase->capacidadeMaxima = MAX_TIJOLOS;
-    fase->tijolos = (Tijolo*) malloc(sizeof(Tijolo) * fase->capacidadeMaxima);
     fase->qtdTijolos = 0;
     fase->tijolosAtivos = 0;
-    fase->pontosBonus = (int*) malloc(sizeof(int) * fase->capacidadeMaxima);
-    fase->multiplicadores = (float*) malloc(sizeof(float) * fase->capacidadeMaxima);
-
+    
+    int linhas = 3 + numeroFase;
     int colunas = 10;
-    int linhas = 5 + numeroFase; if (linhas > 8) linhas = 8;
-    float inicioX = (SCREEN_WIDTH - colunas * TIJOLO_LARGURA) / 2.0f;
-    float inicioY = 80.0f;
+    fase->capacidadeMaxima = linhas * colunas;
 
-    for (int l=0; l<linhas; l++) {
-        for (int c=0; c<colunas; c++) {
-            if (fase->qtdTijolos >= fase->capacidadeMaxima) break;
-            Tijolo *t = &fase->tijolos[fase->qtdTijolos++];
-            inicializaTijolo(t, inicioX + c * TIJOLO_LARGURA, inicioY + l * TIJOLO_ALTURA, 1 + (l % 3));
-            fase->pontosBonus[fase->qtdTijolos-1] = 0;
-            fase->multiplicadores[fase->qtdTijolos-1] = 1.0f;
+    fase->tijolo = (Tijolo*)malloc(fase->capacidadeMaxima * sizeof(Tijolo));
+    fase->pontosBonus = alocarArrayInt(fase->capacidadeMaxima);
+    fase->multiplicadores = alocarArrayFloat(fase->capacidadeMaxima);
+    float espacamentoX = 0.0f;
+    float espacamentoY = 0.0f;
+    float inicioX = (SCREEN_WIDTH - (colunas * TIJOLO_LARGURA + (colunas - 1) * espacamentoX)) / 2.0f;
+    float inicioY = 120.0f;
+
+    for (int i = 0; i < linhas && fase->qtdTijolos < fase->capacidadeMaxima; i++) {
+        for (int j = 0; j < colunas && fase->qtdTijolos < fase->capacidadeMaxima; j++) {
+            float x = inicioX + j * (TIJOLO_LARGURA + espacamentoX);
+            float y = inicioY + i * (TIJOLO_ALTURA + espacamentoY);
+            
+            int vida = 1;
+            int aleatorio = GetRandomValue(0, 100);
+            
+            if (numeroFase >= 2) {
+                if (aleatorio < 20) {
+                    vida = 3;
+                } else if (aleatorio < 50) {
+                    vida = 2;
+                } else {
+                    vida = 1;
+                }
+            } else {
+                if (aleatorio < 30) {
+                    vida = 2;
+                } else {
+                    vida = 1;
+                }
+            }
+
+            inicializarTijolo(&fase->tijolo[fase->qtdTijolos], x, y, vida);
+            fase->qtdTijolos++;
+            fase->tijolosAtivos++;
         }
     }
-    fase->tijolosAtivos = fase->qtdTijolos;
 }
 
 void desenharFase(Fase *fase) {
-    for (int i=0; i<fase->qtdTijolos; i++) {
-        if (!fase->tijolos[i].ativo) continue;
-        desenharTijolo(&fase->tijolos[i]);
+    for (int i = 0; i < fase->qtdTijolos; i++) {
+        desenharTijolo(&fase->tijolo[i]);
     }
 }
 
 bool verificarFaseCompleta(Fase *fase) {
-    return fase->tijolosAtivos <= 0;
+    return contarTijolosAtivos(fase) == 0;
 }
 
 int contarTijolosAtivos(Fase *fase) {
-    int ativos = 0;
-    for (int i=0;i<fase->qtdTijolos;i++) if (fase->tijolos[i].ativo) ativos++;
-    return ativos;
-}
-
-int calcularBonusFase(Fase *fase, int indice) {
-    if (indice < 0 || indice >= fase->qtdTijolos) return 0;
-    int vida = fase->tijolos[indice].vida;
-    if (vida == 1) return PONTOS_TIJOLO_VIDA1;
-    if (vida == 2) return PONTOS_TIJOLO_VIDA2;
-    return PONTOS_TIJOLO_VIDA3;
+    if (fase->qtdTijolos == 0) {
+        fase->tijolosAtivos = 0;
+        return 0;
+    }
+    int count = contarTijolosRecursivo(fase->tijolo, 0, fase->qtdTijolos - 1);
+    fase->tijolosAtivos = count;
+    return count;
 }
 
 void liberarFase(Fase *fase) {
-    if (fase->tijolos) free(fase->tijolos);
-    if (fase->pontosBonus) free(fase->pontosBonus);
-    if (fase->multiplicadores) free(fase->multiplicadores);
-    fase->tijolos = NULL;
-    fase->pontosBonus = NULL;
-    fase->multiplicadores = NULL;
-    fase->qtdTijolos = 0;
-    fase->tijolosAtivos = 0;
+    if (fase->tijolo != NULL) {
+        free(fase->tijolo);
+        fase->tijolo = NULL;
+    }
+    if (fase->pontosBonus != NULL) {
+        liberarArray(fase->pontosBonus);
+        fase->pontosBonus = NULL;
+    }
+    if (fase->multiplicadores != NULL) {
+        liberarArray(fase->multiplicadores);
+        fase->multiplicadores = NULL;
+    }
+}
+
+int calcularBonusFase(Fase *fase, int indice) {
+    if (indice < 0 || indice >= fase->qtdTijolos) {
+        return 0;
+    }
+    return fase->pontosBonus[indice];
 }
